@@ -23,7 +23,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     this.set('tags', tags);
 
     await render(hbs`
-      <TagInput 
+      <TagInput
         @tags={{tags}}
         @addTag={{this.addTag}}
         as |tag|>
@@ -50,7 +50,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     this.set('tags', tags);
 
     await render(hbs`
-      <TagInput 
+      <TagInput
         @tags={{tags}}
         @addTag={{this.addTag}}
         as |tag|>
@@ -81,7 +81,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     this.set('tags', tags);
 
     await render(hbs`
-      <TagInput 
+      <TagInput
         @tags={{tags}}
         @addTag={{this.addTag}}
         @removeTagAtIndex={{this.removeTagAtIndex}}
@@ -116,7 +116,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     this.set('tags', tags);
 
     await render(hbs`
-      <TagInput 
+      <TagInput
         @tags={{tags}}
         @addTag={{this.addTag}}
         @allowSpacesInTags={{true}}
@@ -140,7 +140,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     this.set('tags', tags);
 
     await render(hbs`
-      <TagInput 
+      <TagInput
         @tags={{tags}}
         @readOnly={{true}}
         as |tag|>
@@ -171,7 +171,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     };
 
     await render(hbs`
-    <TagInput 
+    <TagInput
       @tags={{tags}}
       @addTag={{this.addTag}}
       @onKeyUp={{this.onKeyUp}}
@@ -206,7 +206,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     this.set('readOnly', true);
 
     await render(hbs`
-      <TagInput 
+      <TagInput
         @tags={{tags}}
         @addTag={{this.addTag}}
         @readOnly={{readOnly}}
@@ -243,7 +243,7 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
     };
 
     await render(hbs`
-      <TagInput 
+      <TagInput
         @tags={{tags}}
         @addTag={{this.addTag}}
         @readOnly={{readOnly}}
@@ -263,11 +263,65 @@ module('tag-input', 'Integration | Component | Ember Tag Input', function(hooks)
 
     assert.equal(findAll('.emberTagInput-tag').length, 2);
 
-    //Try deleting 
+    //Try deleting
 
-    await triggerKeyEvent(find('.js-ember-tag-input-new'), 'keydown', KEY_CODES.BACKSPACE); 
-    await triggerKeyEvent(find('.js-ember-tag-input-new'), 'keydown', KEY_CODES.BACKSPACE); 
+    await triggerKeyEvent(find('.js-ember-tag-input-new'), 'keydown', KEY_CODES.BACKSPACE);
+    await triggerKeyEvent(find('.js-ember-tag-input-new'), 'keydown', KEY_CODES.BACKSPACE);
 
     assert.equal(findAll('.emberTagInput-tag').length, 2);
+  });
+
+  test('@addTag sends the new tag and the event', async function(assert) {
+    assert.expect(2);
+
+    const tags = Ember.A();
+
+    this.addTag = function(tag, e) {
+      assert.equal(tag, 'new-tag');
+      assert.equal(e.target.className, 'emberTagInput-input js-ember-tag-input-new')
+    };
+    this.set('tags', tags);
+
+    await render(hbs`
+      <TagInput
+        @tags={{tags}}
+        @addTag={{this.addTag}}
+        as |tag|>
+        {{tag}}
+      </TagInput>
+    `);
+
+    await typeIn(find('.js-ember-tag-input-new'), 'new-tag');
+    await blur(find('.js-ember-tag-input-new'));
+  });
+
+  test('@removeTag sends the index and the event', async function(assert) {
+    assert.expect(2);
+
+    const tags = Ember.A();
+
+    this.addTag = function(tag) {
+      tags.pushObject(tag);
+    };
+
+    this.removeTagAtIndex = function(index, e) {
+      assert.equal(index, 0);
+      assert.equal(e.target.className, 'emberTagInput-input js-ember-tag-input-new')
+    };
+    this.set('tags', tags);
+
+    await render(hbs`
+      <TagInput
+        @tags={{tags}}
+        @addTag={{this.addTag}}
+        @removeTagAtIndex={{this.removeTagAtIndex}}
+        as |tag|>
+        {{tag}}
+      </TagInput>
+    `);
+
+    await typeIn(find('.js-ember-tag-input-new'), 'removeme ');
+    await triggerKeyEvent(find('.js-ember-tag-input-new'), 'keydown', KEY_CODES.BACKSPACE);
+    await triggerKeyEvent(find('.js-ember-tag-input-new'), 'keydown', KEY_CODES.BACKSPACE);
   });
 });
