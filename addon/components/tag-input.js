@@ -41,7 +41,7 @@ export default Component.extend({
 
   onKeyUp: false,
 
-  addNewTag(tag) {
+  addNewTag(tag, e) {
     const tags = this.get('tags');
     const addTag = this.get('addTag');
     const allowDuplicates = this.get('allowDuplicates');
@@ -50,7 +50,7 @@ export default Component.extend({
       return false;
     }
 
-    return addTag(tag) !== false;
+    return addTag(tag, e) !== false;
   },
 
   didInsertElement() {
@@ -93,12 +93,12 @@ export default Component.extend({
             }
           }
 
-          removeTagAtIndex(tags.length - 1);
+          removeTagAtIndex(tags.length - 1, e);
         }
       } else {
         if (e.which === KEY_CODES.COMMA || (!allowSpacesInTags && e.which === KEY_CODES.SPACE) || e.which === KEY_CODES.ENTER) {
           if (newTag.length > 0) {
-            if (this.addNewTag(newTag)) {
+            if (this.addNewTag(newTag, e)) {
               e.target.value = '';
             }
           }
@@ -116,7 +116,7 @@ export default Component.extend({
     const newTag = e.target.value.trim();
 
     if (newTag.length > 0) {
-      if (this.addNewTag(newTag)) {
+      if (this.addNewTag(newTag, e)) {
         e.target.value = '';
         this.dispatchKeyUp('');
       }
@@ -143,9 +143,9 @@ export default Component.extend({
   },
 
   actions: {
-    removeTag(index) {
+    removeTag(index, e) {
       const removeTagAtIndex = this.get('removeTagAtIndex');
-      removeTagAtIndex(index);
+      removeTagAtIndex(index, e);
     }
   }
 });
